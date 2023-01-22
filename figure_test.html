@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_d6ae6a9a73aa1db3d1de3dcde6774b3e {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_d6ae6a9a73aa1db3d1de3dcde6774b3e" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_d6ae6a9a73aa1db3d1de3dcde6774b3e = L.map(
+                "map_d6ae6a9a73aa1db3d1de3dcde6774b3e",
+                {
+                    center: [35.91361481574947, -102.68052640612825],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 10,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+            L.control.scale().addTo(map_d6ae6a9a73aa1db3d1de3dcde6774b3e);
+
+            
+
+        
+    
+            var tile_layer_db2cd2c414044da1bbae09d943bcf331 = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca target=\"_blank\" href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_d6ae6a9a73aa1db3d1de3dcde6774b3e);
+        
+    
+            map_d6ae6a9a73aa1db3d1de3dcde6774b3e.fitBounds(
+                [[35.91361405242782, -102.68052772907681], [35.91361557907113, -102.68052508317969]],
+                {}
+            );
+        
+    
+        function geo_json_dfa9655340689ddf7df439dd096230aa_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_dfa9655340689ddf7df439dd096230aa_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_dfa9655340689ddf7df439dd096230aa_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_dfa9655340689ddf7df439dd096230aa_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_dfa9655340689ddf7df439dd096230aa_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        geo_json_dfa9655340689ddf7df439dd096230aa.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_dfa9655340689ddf7df439dd096230aa_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_dfa9655340689ddf7df439dd096230aa = L.geoJson(null, {
+                onEachFeature: geo_json_dfa9655340689ddf7df439dd096230aa_onEachFeature,
+            
+                style: geo_json_dfa9655340689ddf7df439dd096230aa_styler,
+                pointToLayer: geo_json_dfa9655340689ddf7df439dd096230aa_pointToLayer
+        });
+
+        function geo_json_dfa9655340689ddf7df439dd096230aa_add (data) {
+            geo_json_dfa9655340689ddf7df439dd096230aa
+                .addData(data)
+                .addTo(map_d6ae6a9a73aa1db3d1de3dcde6774b3e);
+        }
+            geo_json_dfa9655340689ddf7df439dd096230aa_add({"bbox": [-102.68052772907681, 35.91361405242782, -102.68052508317969, 35.91361557907113], "features": [{"bbox": [-102.68052688677753, 35.91361442449277, -102.68052688677753, 35.91361442449277], "geometry": {"coordinates": [-102.68052688677753, 35.91361442449277], "type": "Point"}, "id": "0", "properties": {"Address": "3967 Main St, Kansas City, MO 64111, United States", "Latitude": 39.0545677, "Longitude": -94.58549495, "Type": "grocery store", "Unnamed: 0": 0}, "type": "Feature"}, {"bbox": [-102.68052699093869, 35.91361442235562, -102.68052699093869, 35.91361442235562], "geometry": {"coordinates": [-102.68052699093869, 35.91361442235562], "type": "Point"}, "id": "1", "properties": {"Address": "4001 Mill St, Kansas City, MO 64111, United States", "Latitude": 39.05478345, "Longitude": -94.59490528, "Type": "grocery store", "Unnamed: 0": 1}, "type": "Feature"}, {"bbox": [-102.68052699093869, 35.91361442235562, -102.68052699093869, 35.91361442235562], "geometry": {"coordinates": [-102.68052699093869, 35.91361442235562], "type": "Point"}, "id": "2", "properties": {"Address": "4001 Mill St, Kansas City, MO 64111, United States", "Latitude": 39.05478345, "Longitude": -94.59490528, "Type": "grocery store", "Unnamed: 0": 2}, "type": "Feature"}, {"bbox": [-102.68052688346235, 35.913614822569244, -102.68052688346235, 35.913614822569244], "geometry": {"coordinates": [-102.68052688346235, 35.913614822569244], "type": "Point"}, "id": "3", "properties": {"Address": "10 E 13th St, Kansas City, MO 64106, United States", "Latitude": 39.0987093, "Longitude": -94.5830685, "Type": "grocery store", "Unnamed: 0": 3}, "type": "Feature"}, {"bbox": [-102.68052667078264, 35.91361405886996, -102.68052667078264, 35.91361405886996], "geometry": {"coordinates": [-102.68052667078264, 35.91361405886996], "type": "Point"}, "id": "4", "properties": {"Address": "1616 E 63rd St, Kansas City, MO 64110, United States", "Latitude": 39.01307258, "Longitude": -94.56795868, "Type": "grocery store", "Unnamed: 0": 4}, "type": "Feature"}, {"bbox": [-102.68052687722476, 35.913615277994104, -102.68052687722476, 35.913615277994104], "geometry": {"coordinates": [-102.68052687722476, 35.913615277994104], "type": "Point"}, "id": "5", "properties": {"Address": "2751 Burlington St, North Kansas City, MO 64116, United States", "Latitude": 39.14919948, "Longitude": -94.58007188, "Type": "grocery store", "Unnamed: 0": 5}, "type": "Feature"}, {"bbox": [-102.6805263680558, 35.913615513433, -102.6805263680558, 35.913615513433], "geometry": {"coordinates": [-102.6805263680558, 35.913615513433], "type": "Point"}, "id": "6", "properties": {"Address": "4357 NE Chouteau Trafficway, Kansas City, MO 64117, United States", "Latitude": 39.1731017, "Longitude": -94.5328692, "Type": "grocery store", "Unnamed: 0": 6}, "type": "Feature"}, {"bbox": [-102.6805263680558, 35.913615513433, -102.6805263680558, 35.913615513433], "geometry": {"coordinates": [-102.6805263680558, 35.913615513433], "type": "Point"}, "id": "7", "properties": {"Address": "4357 NE Chouteau Trafficway, Kansas City, MO 64117, United States", "Latitude": 39.1731017, "Longitude": -94.5328692, "Type": "grocery store", "Unnamed: 0": 7}, "type": "Feature"}, {"bbox": [-102.6805268810369, 35.91361557907113, -102.6805268810369, 35.91361557907113], "geometry": {"coordinates": [-102.6805268810369, 35.91361557907113], "type": "Point"}, "id": "8", "properties": {"Address": "4820 N Oak Trafficway, Kansas City, MO 64118, United States", "Latitude": 39.18261255, "Longitude": -94.57880692, "Type": "grocery store", "Unnamed: 0": 8}, "type": "Feature"}, {"bbox": [-102.68052679769593, 35.91361476267518, -102.68052679769593, 35.91361476267518], "geometry": {"coordinates": [-102.68052679769593, 35.91361476267518], "type": "Point"}, "id": "9", "properties": {"Address": "640 E 18th St, Kansas City, MO 64108, United States", "Latitude": 39.0916928, "Longitude": -94.5756495, "Type": "grocery store", "Unnamed: 0": 9}, "type": "Feature"}, {"bbox": [-102.68052692094521, 35.91361405242782, -102.68052692094521, 35.91361405242782], "geometry": {"coordinates": [-102.68052692094521, 35.91361405242782], "type": "Point"}, "id": "10", "properties": {"Address": "6327 Brookside Plaza, Kansas City, MO 64113, United States", "Latitude": 39.01344551, "Longitude": -94.59056635, "Type": "grocery store", "Unnamed: 0": 10}, "type": "Feature"}, {"bbox": [-102.68052771869655, 35.91361407178611, -102.68052771869655, 35.91361407178611], "geometry": {"coordinates": [-102.68052771869655, 35.91361407178611], "type": "Point"}, "id": "11", "properties": {"Address": "6655 Martway St, Mission, KS 66202, United States", "Latitude": 39.0190608, "Longitude": -94.66244743, "Type": "grocery store", "Unnamed: 0": 11}, "type": "Feature"}, {"bbox": [-102.68052508317969, 35.9136142690968, -102.68052508317969, 35.9136142690968], "geometry": {"coordinates": [-102.68052508317969, 35.9136142690968], "type": "Point"}, "id": "12", "properties": {"Address": "4209 E 50th Terrace, Kansas City, MO 64130, United States", "Latitude": 39.02949, "Longitude": -94.423579, "Type": "grocery store", "Unnamed: 0": 12}, "type": "Feature"}, {"bbox": [-102.68052685518401, 35.91361424448254, -102.68052685518401, 35.91361424448254], "geometry": {"coordinates": [-102.68052685518401, 35.91361424448254], "type": "Point"}, "id": "13", "properties": {"Address": "301 E 51st St, Kansas City, MO 64112, United States", "Latitude": 39.034463, "Longitude": -94.5836061, "Type": "grocery store", "Unnamed: 0": 13}, "type": "Feature"}, {"bbox": [-102.6805267431528, 35.913614515439015, -102.6805267431528, 35.913614515439015], "geometry": {"coordinates": [-102.6805267431528, 35.913614515439015], "type": "Point"}, "id": "14", "properties": {"Address": "3410 Troost Ave, Kansas City, MO 64109, United States", "Latitude": 39.0640314, "Longitude": -94.57204906, "Type": "grocery store", "Unnamed: 0": 14}, "type": "Feature"}, {"bbox": [-102.68052637916348, 35.91361480057207, -102.68052637916348, 35.91361480057207], "geometry": {"coordinates": [-102.68052637916348, 35.91361480057207], "type": "Point"}, "id": "15", "properties": {"Address": "3821 E Truman Rd, Kansas City, MO 64127, United States", "Latitude": 39.094077, "Longitude": -94.537681, "Type": "grocery store", "Unnamed: 0": 15}, "type": "Feature"}, {"bbox": [-102.68052535610926, 35.91361485437536, -102.68052535610926, 35.91361485437536], "geometry": {"coordinates": [-102.68052535610926, 35.91361485437536], "type": "Point"}, "id": "16", "properties": {"Address": "11200 E Truman Rd, Independence, MO 64050, United States", "Latitude": 39.0955976, "Longitude": -94.4450789, "Type": "grocery store", "Unnamed: 0": 16}, "type": "Feature"}, {"bbox": [-102.68052535610926, 35.91361485437536, -102.68052535610926, 35.91361485437536], "geometry": {"coordinates": [-102.68052535610926, 35.91361485437536], "type": "Point"}, "id": "17", "properties": {"Address": "11200 E Truman Rd, Independence, MO 64050, United States", "Latitude": 39.0955976, "Longitude": -94.4450789, "Type": "grocery store", "Unnamed: 0": 17}, "type": "Feature"}, {"bbox": [-102.68052772907681, 35.913614952514926, -102.68052772907681, 35.913614952514926], "geometry": {"coordinates": [-102.68052772907681, 35.913614952514926], "type": "Point"}, "id": "18", "properties": {"Address": "2815 State Ave, Kansas City, KS 66102, United States", "Latitude": 39.1167994, "Longitude": -94.6586775, "Type": "grocery store", "Unnamed: 0": 18}, "type": "Feature"}, {"bbox": [-102.68052564179426, 35.91361451333352, -102.68052564179426, 35.91361451333352], "geometry": {"coordinates": [-102.68052564179426, 35.91361451333352], "type": "Point"}, "id": "19", "properties": {"Address": "3500 Blue Ridge Cutoff, Kansas City, MO 64133, United States", "Latitude": 39.05901, "Longitude": -94.47268, "Type": "grocery store", "Unnamed: 0": 19}, "type": "Feature"}, {"bbox": [-102.68052684390528, 35.91361454621201, -102.68052684390528, 35.91361454621201], "geometry": {"coordinates": [-102.68052684390528, 35.91361454621201], "type": "Point"}, "id": "20", "properties": {"Address": "241 Linwood Blvd, Kansas City, MO 64111, United States", "Latitude": 39.06788284, "Longitude": -94.58097594, "Type": "grocery store", "Unnamed: 0": 20}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_dfa9655340689ddf7df439dd096230aa.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["Unnamed: 0", "Address", "Latitude", "Longitude", "Type"];
+    let aliases = ["Unnamed: 0", "Address", "Latitude", "Longitude", "Type"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{"className": "foliumtooltip", "sticky": true});
+                     
+</script>
+</html>
