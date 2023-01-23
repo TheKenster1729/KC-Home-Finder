@@ -1,4 +1,3 @@
-import googlemaps
 from jsonpath import JSONPath
 import pandas as pd
 from selenium import webdriver as WD
@@ -137,27 +136,6 @@ def rangeSearch(anchor, other, radius = 3000):
     
     return query
 
-def walkingDistanceMatrix(anchor, other):
-    client = googlemaps.Client(key = 'AIzaSyAGc-ZGZ3X4AU03AGWyhhCkPVd3OrC_V30')
-    now = datetime(2023, 1, 15, 12)
-    distance_matrix = pd.DataFrame([])
-    inds, dists = rangeSearch(anchor, other)
-    for other_index, range_search_results in enumerate(inds):
-        for anchor_index in range_search_results:
-            anchor_property_address = anchor['Address'].iloc[anchor_index]
-            other_property_address = other['Address'].iloc[other_index]                
-            distance = client.distance_matrix(anchor_property_address,
-                                        other_property_address,
-                                        mode = "walking",
-                                        departure_time = now
-                                        )['rows'][0]['elements'][0]['duration']['value']
-            distance_matrix.loc[anchor_property_address, other_property_address] = distance/60
-            if anchor_property_address == '211 Linwood Blvd, Kansas City, MO 64111, United States':
-                if other_property_address == '10 E 13th St, Kansas City, MO 64106, United States':
-                    print(distance)
-
-    return distance_matrix
-
 def generateCSVFiles():
     grocery = Groceries()
     grocery.makeListOfPlaces()
@@ -219,68 +197,4 @@ def rangeSearchTest():
 
 if __name__ == "__main__":
     pass
-    # school_df = pd.read_csv('high school_properties.csv')
-    # grocery_df = pd.read_csv('grocery store_properties.csv')
-    # apartments_df = pd.read_csv('apartment_properties.csv')
-
-    #setting center for our map
-    # center = [20.593684,78.96288]
-
-    # creating map
-    # map = folium.Map(location = center, zoom_start = 10)
-    # for i, j in grocery_df.iterrows():
-    #     location = [j['Latitude'], j['Longitude']]
-    #     folium.Marker(location, popup = f'Grocery Store:{j["Address"]}').add_to(map)
-    # map.save("tutorial.html")
-    # map_df = grocery_df[['Latitude', 'Longitude']]
-    # map_df = map_df.rename({'Latitude': 'lat', 'Longitude': 'lon'}, axis = 1)
-    # st.map(map_df)
-    # gdf = gp.GeoDataFrame(grocery_df, geometry = gp.points_from_xy(grocery_df.Longitude, grocery_df.Latitude))
-    # print(gdf)
-    # gdf.set_crs(epsg = 6922, inplace = True, allow_override = True)
-    # m = gdf.explore()
-    # m.save("figure_test.html")
-    # print(gdf)
-    # path_to_data = gp.datasets.get_path("nybb")
-    # gdf = gp.read_file(path_to_data)
-    # print(gdf)
-    # gdf = gdf.set_index("BoroName")
-    # gdf["area"] = gdf.area
-
-    # m = gdf.explore("area")
-    # m.save("tutorial.html")
-
-    # other = pd.concat([school_df, grocery_df], join = 'inner')
-    # ind, dists = rangeSearch(apartments_df, other)
-    # for i, val in enumerate(ind):
-    #     apartment = apartments_df.iloc[i]
-    #     matches = other.iloc[val]
-    #     if len(matches['Type'].unique()) == 2:            
-    #         if (matches['Address'].str.startswith('301 E 51st St').any()) or (matches['Address'].str.startswith('241 Linwood Blvd').any()):
-    #             print(apartment['Address'])
-    #             print(matches[['Address', 'Type']])
-    # # rangeSearchTest()
-    # ind, results = rangeSearch(grocery_df, school_df)
-    # grocery_property = 0
-    # properties_in_range_indices = search[grocery_property]
-    # properties_in_range = school_df.iloc[properties_in_range_indices]
-    # print(properties_in_range)
-    # searchForOptimalApartments([Schools(), Groceries(), Living()], Living(), 60)
-    # locations1 = ['1444 Grand Blvd, Kansas City, MO 64106', '230 E 30th St, Kansas City, MO 64108', '5100 Oak St, Kansas City, MO 64112']
-    # locations2 = ['10 E 13th St, Kansas City, MO 64106, United States', '640 E 18th St, Kansas City, MO 64108, United States', '310 E 5th St, Kansas City, MO 64106, United States', '2620 Independence Ave, Kansas City, MO 64124, United States', '201 Wyandotte St # 402, Kansas City, MO 64105, United States']
-    # distance_matrix = walkingDistanceMatrix(school_df, grocery_df)
-    # distance_matrix.to_csv('results.csv')
-
-    # school_list = list(school_df['Address'])
-    # grocery_list = list(grocery_df['Address'])
-    # distance_matrix_raw = walkingDistanceMatrixRaw(grocery_list, school_list)
-    # distance_matrix_raw.to_csv('results_raw.csv')
-    # distance_matrix = distance_matrix[distance_matrix.apply(lambda x: x < 15)]
-
-    # client = googlemaps.Client(key = 'AIzaSyAGc-ZGZ3X4AU03AGWyhhCkPVd3OrC_V30')
-    # distance = client.distance_matrix('10 E 13th St, Kansas City, MO 64106, United States',
-    #                                     '211 Linwood Blvd, Kansas City, MO 64111, United States',
-    #                                     mode = "walking",
-    #                                     departure_time = datetime(2023, 1, 14, 12)
-    #                                     )['rows'][0]['elements'][0]['duration']['value']
-    # print(distance)
+    pass
