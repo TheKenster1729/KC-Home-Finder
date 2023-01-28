@@ -14,6 +14,10 @@ from geopy.geocoders import Nominatim
 import matplotlib.pyplot as plt
 from math import radians
 import geopandas as gp
+import pydeck as pdk
+import streamlit as st
+import numpy as np
+import pydeck
 
 class SingleLocation:
     def __init__(self, type, address, geolocator):
@@ -177,6 +181,37 @@ def searchForOptimalApartments(groups: list, anchor, threshold):
         distance_matrix = walkingDistanceMatrix(anchor_properties, pn)
         print(distance_matrix)
 
+def addIconLayer(df, size = 3):
+    layer = pdk.Layer(
+        type = "IconLayer",
+        data = df,
+        get_icon = "icon_data",
+        get_size = size,
+        size_scale = 15,
+        get_position = ["Longitude", "Latitude"],
+        pickable = True,
+    )
+    return layer
+
+def addScatterLayer(df, radius):
+    layer = pdk.Layer(
+    "ScatterplotLayer",
+    df,
+    pickable = True,
+    opacity = 0.8,
+    stroked = True,
+    filled = True,
+    radius_scale = radius,
+    radius_min_pixels = 100,
+    radius_max_pixels = 100,
+    line_width_min_pixels = 1,
+    get_position = ['Longitude', 'Latitude'],
+    get_radius = radius,
+    get_fill_color = [255, 140, 0],
+    get_line_color = [0, 0, 0],
+    )
+    return layer
+
 def rangeSearchTest():
     X = np.random.random_sample((10, 2))
     y = np.random.random_sample((6, 2))
@@ -196,5 +231,4 @@ def rangeSearchTest():
     plt.show()
 
 if __name__ == "__main__":
-    pass
     pass

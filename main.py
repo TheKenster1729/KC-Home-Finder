@@ -1,8 +1,4 @@
 from utils import *
-import pydeck as pdk
-import streamlit as st
-import numpy as np
-import pydeck
 
 school_df = pd.read_csv('high school_properties.csv')
 grocery_df = pd.read_csv('grocery store_properties.csv')
@@ -71,29 +67,9 @@ def displayOptions(selected_schools):
     unique_grocery_inds = flatten_array(ind_grocery)
 
     groceries_to_display = grocery_df.iloc[unique_grocery_inds]
-    # for i, school_name in enumerate(selected_schools):
-    # grocery_stores = grocery_df.iloc[ind_grocery[i]]
-    # grocery_stores['icon_data'] = [icon_data] * len(grocery_stores)
-    # print(grocery_stores)
-    layer_school = pdk.Layer(
-        type = "IconLayer",
-        data = selected_schools_df,
-        get_icon = "icon_data",
-        get_size = 6,
-        size_scale = 15,
-        get_position = ["Longitude", "Latitude"],
-        pickable = True,
-    )
-
-    layer_grocery = pdk.Layer(
-        type = "IconLayer",
-        data = groceries_to_display,
-        get_icon = "icon_data",
-        get_size = 6,
-        size_scale = 15,
-        get_position = ["Longitude", "Latitude"],
-        pickable = True,
-    )
+    layer_grocery = addIconLayer(groceries_to_display)
+    layer_school = addIconLayer(selected_schools_df)
+    scatter_layer = addScatterLayer(selected_schools_df, 3000)
 
     view_state = pdk.ViewState(
         longitude = -94.57717312400938,
@@ -101,7 +77,7 @@ def displayOptions(selected_schools):
         zoom = 12,
         min_zoom = 5,
         max_zoom = 25)
-    pydeck_chart = pydeck.Deck(layers = [layer_grocery, layer_school], initial_view_state = view_state, tooltip = {"text": "{Address}"})
+    pydeck_chart = pydeck.Deck(layers = [layer_grocery, layer_school, scatter_layer], initial_view_state = view_state, tooltip = {"text": "{Address}"})
     st.pydeck_chart(pydeck_chart)
 
 with st.form("select_schools"):
