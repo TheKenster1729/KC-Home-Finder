@@ -90,7 +90,7 @@ def displayOptions(selected_schools):
 
     # initialize apartments display
     apartments_to_display = apartments_df.iloc[unique_apartments_inds]
-    layer_apartments = addIconLayer(apartments_to_display, size = 1)
+    layer_apartments = addIconLayer(apartments_to_display, size = 3)
 
     view_state = pdk.ViewState(
         longitude = -94.57717312400938,
