@@ -5,18 +5,28 @@ grocery_df = pd.read_csv('grocery store_properties.csv')
 apartments_df = pd.read_csv('apartment_properties.csv')
 
 grocery_icon_url = "https://raw.githubusercontent.com/TheKenster1729/KC-Home-Finder/master/Pictures/image_processing20200903-25086-15xddqw.png"
-school_icon_url = "https://raw.githubusercontent.com/TheKenster1729/KC-Home-Finder/master/Pictures/1024px-Round_Landmark_School_Icon_-_Transparent.png"
 grocery_icon_data = {"url": grocery_icon_url,
     "width": 242,
     "height": 242,
     "anchorY": 242,
 }
+grocery_df['icon_data'] = [grocery_icon_data] * len(grocery_df)
+
+school_icon_url = "https://raw.githubusercontent.com/TheKenster1729/KC-Home-Finder/master/Pictures/1024px-Round_Landmark_School_Icon_-_Transparent.png"
 school_icon_data = {"url": school_icon_url,
     "width": 242,
     "height": 242,
     "anchorY": 242,
 }
-grocery_df['icon_data'] = [grocery_icon_data] * len(grocery_df)
+
+apartment_icon_url = "https://raw.githubusercontent.com/TheKenster1729/KC-Home-Finder/master/Pictures/apartment.jpg"
+apartment_icon_data = {"url": apartment_icon_url,
+    "width": 242,
+    "height": 242,
+    "anchorY": 242,
+}
+apartments_df['icon_data'] = [apartment_icon_data] * len(apartments_df)
+
 def test_icons():
     # Data from OpenStreetMap, accessed via osmpy
     DATA_URL = "https://raw.githubusercontent.com/ajduberstein/geo_datasets/master/biergartens.json"
@@ -60,16 +70,27 @@ def flatten_array(array):
     return np.unique(unique_vals_array).astype(int)
 
 def displayOptions(selected_schools):
+    # prepare the selected schools for a range search and initialize display
     selected_schools_df = school_df[school_df['Name'].isin(selected_schools)]
     selected_schools_df['icon_data'] = [school_icon_data] * len(selected_schools_df)
+    layer_school = addIconLayer(selected_schools_df)
+    # scatter_layer = addScatterLayer(selected_schools_df, 3000)
+
+    # grocery range search
     ind_grocery, _ = rangeSearch(selected_schools_df, grocery_df)
-    ind_apartments, _ = rangeSearch(selected_schools_df, apartments_df)
     unique_grocery_inds = flatten_array(ind_grocery)
 
+    # initialize grocery display
     groceries_to_display = grocery_df.iloc[unique_grocery_inds]
     layer_grocery = addIconLayer(groceries_to_display)
-    layer_school = addIconLayer(selected_schools_df)
-    scatter_layer = addScatterLayer(selected_schools_df, 3000)
+
+    # apartments range search
+    ind_apartments, _ = rangeSearch(selected_schools_df, apartments_df)
+    unique_apartments_inds = flatten_array(ind_apartments)
+
+    # initialize apartments display
+    apartments_to_display = apartments_df.iloc[unique_apartments_inds]
+    layer_apartments = addIconLayer(apartments_to_display)
 
     view_state = pdk.ViewState(
         longitude = -94.57717312400938,
@@ -77,7 +98,7 @@ def displayOptions(selected_schools):
         zoom = 12,
         min_zoom = 5,
         max_zoom = 25)
-    pydeck_chart = pydeck.Deck(layers = [layer_grocery, layer_school, scatter_layer], initial_view_state = view_state, tooltip = {"text": "{Address}"})
+    pydeck_chart = pydeck.Deck(layers = [layer_grocery, layer_school, layer_apartments], initial_view_state = view_state, tooltip = {"text": "{Address}"})
     st.pydeck_chart(pydeck_chart)
 
 with st.form("select_schools"):
