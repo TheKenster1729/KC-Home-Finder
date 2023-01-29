@@ -19,7 +19,7 @@ school_icon_data = {"url": school_icon_url,
     "anchorY": 242,
 }
 
-apartment_icon_url = "https://raw.githubusercontent.com/TheKenster1729/KC-Home-Finder/master/Pictures/apartment.jpg"
+apartment_icon_url = "https://raw.githubusercontent.com/TheKenster1729/KC-Home-Finder/master/Pictures/apartment.png"
 apartment_icon_data = {"url": apartment_icon_url,
     "width": 242,
     "height": 242,
