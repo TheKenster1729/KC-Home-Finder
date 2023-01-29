@@ -17,7 +17,8 @@ import geopandas as gp
 import pydeck as pdk
 import streamlit as st
 import numpy as np
-import pydeck
+import folium
+from streamlit_folium import st_folium
 
 class SingleLocation:
     def __init__(self, type, address, geolocator):
@@ -130,6 +131,15 @@ class Living(BaseKCPlaces):
             page_list_of_locations = self.collectAddressesForOnePage(property_address_elements)
             self.list_of_places += page_list_of_locations
 
+def generateCSVFiles():
+    grocery = Groceries()
+    grocery.makeListOfPlaces()
+    grocery.sendListToCSV(overwrite = True)
+
+    schools = Schools()
+    schools.makeListOfPlaces()
+    schools.sendListToCSV(overwrite = True)
+
 def rangeSearch(anchor, other, radius = 3000):
     X_anchor = anchor[['Latitude', 'Longitude']].applymap(radians)
     X_other = other[['Latitude', 'Longitude']].applymap(radians)
@@ -140,14 +150,21 @@ def rangeSearch(anchor, other, radius = 3000):
     
     return query
 
-def generateCSVFiles():
-    grocery = Groceries()
-    grocery.makeListOfPlaces()
-    grocery.sendListToCSV(overwrite = True)
+def addToFoliumMap(location_df, map):
 
-    schools = Schools()
-    schools.makeListOfPlaces()
-    schools.sendListToCSV(overwrite = True)
+    def createMarker(property_data):
+        colors = {'elementary': 'red', 'middle': 'red', 'high': 'red', 'middle/high': 'red', 
+            'elementary/middle/high': 'red', 'elementary/middle': 'red', 'pre-k': 'red',  'grocery store': 'purple', 'Apartment': 'blue'}
+        icons = {'elementary': 'pencil', 'middle': 'pencil', 'high': 'pencil', 'middle/high': 'pencil', 
+            'elementary/middle/high': 'pencil', 'elementary/middle': 'pencil', 'pre-k': 'pencil',  'grocery store': 'shopping-cart', 
+            'Apartment': 'home'}
+        folium.Marker(
+            location = [property_data.Latitude, property_data.Longitude],
+            popup = property_data.Address,
+            icon = folium.Icon(color = colors[property_data.Type], icon = icons[property_data.Type]),
+        ).add_to(map)
+
+    location_df.apply(createMarker, axis = 1)
 
 def walkingDistanceMatrixRaw(l1, l2):
     client = googlemaps.Client(key = 'AIzaSyAGc-ZGZ3X4AU03AGWyhhCkPVd3OrC_V30')
@@ -180,37 +197,6 @@ def searchForOptimalApartments(groups: list, anchor, threshold):
         pn = list_of_all_properties.pop()
         distance_matrix = walkingDistanceMatrix(anchor_properties, pn)
         print(distance_matrix)
-
-def addIconLayer(df, size = 3):
-    layer = pdk.Layer(
-        type = "IconLayer",
-        data = df,
-        get_icon = "icon_data",
-        get_size = size,
-        size_scale = 15,
-        get_position = ["Longitude", "Latitude"],
-        pickable = True,
-    )
-    return layer
-
-def addScatterLayer(df, radius):
-    layer = pdk.Layer(
-    "ScatterplotLayer",
-    df,
-    pickable = True,
-    opacity = 0.8,
-    stroked = True,
-    filled = True,
-    radius_scale = radius,
-    radius_min_pixels = 100,
-    radius_max_pixels = 100,
-    line_width_min_pixels = 1,
-    get_position = ['Longitude', 'Latitude'],
-    get_radius = radius,
-    get_fill_color = [255, 140, 0],
-    get_line_color = [0, 0, 0],
-    )
-    return layer
 
 def rangeSearchTest():
     X = np.random.random_sample((10, 2))
