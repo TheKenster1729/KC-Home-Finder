@@ -93,7 +93,7 @@ def displayOptions(selected_schools, map, radius):
 
 st.set_page_config(layout = 'wide')
 with st.form("select_schools"):
-    label = 'Please select the school(s) you would like to see options for.'
+    label = 'Please select the school(s) you would like to see options for. Schools will be rendered as a pencil on the map.'
     selected_schools = st.multiselect(label, school_df['Name'])
     radius = st.slider("Select the radius (in meters) you'd like to search around each school.", max_value = 10000, step = 100,
                 value = 2000)
