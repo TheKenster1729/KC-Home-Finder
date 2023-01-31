@@ -188,7 +188,7 @@ def addToFoliumMap(location_df, map):
         if property_data.Type == 'apartment':
             popup = folium.Popup(f"""<p> {property_data.Address}<p>
                         <p>{property_data.Rent}</p>
-                        <p><a href="{property_data.URL}">Link</a></p>
+                        <p><a href="{property_data.URL}" target="_blank">Link</a></p>
                         """,  max_width = 100
                     )
         else:
