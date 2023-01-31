@@ -19,6 +19,7 @@ import streamlit as st
 import numpy as np
 import folium
 from streamlit_folium import st_folium
+import googlemaps
 
 class SingleLocation:
     def __init__(self, type, address, geolocator):
@@ -31,12 +32,18 @@ class SingleLocation:
         self.lat = location.latitude
         self.long = location.longitude
 
+class Apartment(SingleLocation):
+    def __init__(self, url, rent, type, address, geolocator):
+        super().__init__(type, address, geolocator)
+        self.url = url
+        self.rent = rent
+
 class BaseKCPlaces:
     # this class serves as the base for the specific types of locations (e.g.
     # schools, grocery stores) that will be considered by the searching alg
     def __init__(self, place_type, origin):
         self.place_type = place_type
-        self.client = googlemaps.Client(key = 'AIzaSyAGc-ZGZ3X4AU03AGWyhhCkPVd3OrC_V30')
+        self.client = googlemaps.Client(key = None)
         self.geolocator = Nominatim(user_agent = "Home_Finder")
         self.origin = origin
 
@@ -98,17 +105,18 @@ class Living(BaseKCPlaces):
     def __init__(self):
         super().__init__('apartment', 'Kansas City, MO')
 
-    def collectAddressesForOnePage(self, list_of_elements):
-        property_addresses = []
-        for element in list_of_elements:
-            address = element.get_property("title") 
+    def collectInfoForOnePage(self, list_of_address_elements, list_of_rent_elements, set_of_url_elements):
+        list_of_url_elements = list(set_of_url_elements)
+        for add, rent, url in zip(list_of_address_elements, list_of_rent_elements, list_of_url_elements):
+            address = add.get_property("title")
+            price = rent.text
             try:
-                place_obj = SingleLocation(self.place_type, address, self.geolocator)
-                property_addresses.append(place_obj)
+                place_obj = Apartment(url, price, self.place_type, address, self.geolocator)
+                row_to_add = pd.DataFrame(data = {"Address": [place_obj.address], "Longitude": [place_obj.long], 
+                        "Latitude": [place_obj.lat], "Rent": [place_obj.rent], "URL": [place_obj.url], "Type": [place_obj.type]})
+                self.places_database = pd.concat([self.places_database, row_to_add], ignore_index = True)
             except AttributeError:
                 print('{} could not be geocoded'.format(address))
-
-        return property_addresses
 
     def checkValidAddress(self, address):
         beginning_condition = re.match(r'^[0-9]', address)
@@ -118,27 +126,46 @@ class Living(BaseKCPlaces):
         else:
             return False
 
+    def getApartmentAttributes(self, browser, url):
+        browser.get(url)
+        # gets all the property addresses on this page
+        property_addresses = browser.find_elements(By.CLASS_NAME, "property-address")
+        # gets all the rents on this page
+        property_prices_elements = browser.find_elements(By.CLASS_NAME, "property-pricing")
+        # first step to getting all the links, but needs some polishing first
+        property_links = browser.find_elements(By.CLASS_NAME, "property-link")
+        property_links_unique = set([element.get_property("href") for element in property_links])
+
+        return property_addresses, property_prices_elements, property_links_unique
+
     def makeListOfPlaces(self):
         chrome_browser = WD.Chrome(ChromeDriverManager().install())
         chrome_browser.get("https://www.apartments.com/kansas-city-mo/1-bedrooms/")
         page_range_sentence = chrome_browser.find_element(By.CLASS_NAME, "pageRange").text
         page_numbers = int(re.findall('of.*', page_range_sentence)[0][2:])
 
-        self.list_of_places = []
+        self.places_database = pd.DataFrame(columns = ['Address', 'Longitude', 'Latitude', 'Rent', 'URL', 'Type'])
         for i in range(1, page_numbers + 1):
-            chrome_browser.get("https://www.apartments.com/kansas-city-mo/1-bedrooms/{}".format(i))
-            property_address_elements = chrome_browser.find_elements(By.CLASS_NAME, "property-address")
-            page_list_of_locations = self.collectAddressesForOnePage(property_address_elements)
-            self.list_of_places += page_list_of_locations
+            url = "https://www.apartments.com/kansas-city-mo/1-bedrooms/{}".format(i)
+            addresses, rents, urls = self.getApartmentAttributes(chrome_browser, url)
+            # create an Apartment object after processing all the data
+            self.collectInfoForOnePage(addresses, rents, urls)
+
+    def sendListToCSV(self):
+        self.places_database.to_csv("apartments.csv")
 
 def generateCSVFiles():
-    grocery = Groceries()
-    grocery.makeListOfPlaces()
-    grocery.sendListToCSV(overwrite = True)
+    # grocery = Groceries()
+    # grocery.makeListOfPlaces()
+    # grocery.sendListToCSV(overwrite = True)
 
-    schools = Schools()
-    schools.makeListOfPlaces()
-    schools.sendListToCSV(overwrite = True)
+    # schools = Schools()
+    # schools.makeListOfPlaces()
+    # schools.sendListToCSV(overwrite = True)
+
+    apartments = Living()
+    apartments.makeListOfPlaces()
+    apartments.sendListToCSV()
 
 def rangeSearch(anchor, other, radius = 3000):
     X_anchor = anchor[['Latitude', 'Longitude']].applymap(radians)
@@ -154,67 +181,22 @@ def addToFoliumMap(location_df, map):
 
     def createMarker(property_data):
         colors = {'elementary': 'red', 'middle': 'red', 'high': 'red', 'middle/high': 'red', 
-            'elementary/middle/high': 'red', 'elementary/middle': 'red', 'pre-k': 'red',  'grocery store': 'purple', 'Apartment': 'blue'}
+            'elementary/middle/high': 'red', 'elementary/middle': 'red', 'pre-k': 'red',  'grocery store': 'purple', 'apartment': 'blue'}
         icons = {'elementary': 'pencil', 'middle': 'pencil', 'high': 'pencil', 'middle/high': 'pencil', 
             'elementary/middle/high': 'pencil', 'elementary/middle': 'pencil', 'pre-k': 'pencil',  'grocery store': 'shopping-cart', 
-            'Apartment': 'home'}
+            'apartment': 'home'}
+        if property_data.Type == 'apartment':
+            popup = folium.Popup(f"""<p> {property_data.Address}<p>
+                        <p>{property_data.Rent}</p>
+                        <p><a href="{property_data.URL}">Link</a></p>
+                        """,  max_width = 100
+                    )
+        else:
+            popup = folium.Popup(property_data.Address, max_width = 100)
         folium.Marker(
             location = [property_data.Latitude, property_data.Longitude],
-            popup = property_data.Address,
+            popup = popup,
             icon = folium.Icon(color = colors[property_data.Type], icon = icons[property_data.Type]),
         ).add_to(map)
 
     location_df.apply(createMarker, axis = 1)
-
-def walkingDistanceMatrixRaw(l1, l2):
-    client = googlemaps.Client(key = 'AIzaSyAGc-ZGZ3X4AU03AGWyhhCkPVd3OrC_V30')
-    now = datetime(2023, 1, 14, 12)
-    distance_matrix = pd.DataFrame([])
-    for loc1 in l1:
-        for loc2 in l2:
-            distance = client.distance_matrix(loc1,
-                                        loc2,
-                                        mode = "walking",
-                                        departure_time = now
-                                        )['rows'][0]['elements'][0]['duration']['value']
-            distance_matrix.loc[loc1, loc2] = distance/60
-    
-    return distance_matrix
-
-def searchForOptimalApartments(groups: list, anchor, threshold):
-
-    list_of_csv_files_in_dir = [file for file in os.listdir() if file.endswith('.csv')]
-    if not len(list_of_csv_files_in_dir) > 0:
-        for property_type in groups:
-            property_type.makeListOfPlaces()
-            property_type.sendListToCSV()
-        searchForOptimalApartments(groups)
-
-    list_of_csv_files_in_dir_no_anchor = [file for file in list_of_csv_files_in_dir.copy() if not anchor.place_type in file]
-    list_of_all_properties = [list(pd.read_csv(file).columns) for file in list_of_csv_files_in_dir_no_anchor]
-    anchor_properties = list(pd.read_csv(list(set(list_of_csv_files_in_dir).difference(set(list_of_csv_files_in_dir_no_anchor)))[0]).columns)
-    while len(list_of_all_properties) > 0:
-        pn = list_of_all_properties.pop()
-        distance_matrix = walkingDistanceMatrix(anchor_properties, pn)
-        print(distance_matrix)
-
-def rangeSearchTest():
-    X = np.random.random_sample((10, 2))
-    y = np.random.random_sample((6, 2))
-
-    tree = BallTree(X, metric = 'euclidean')
-    matches = tree.query_radius(y, 0.2)
-    
-    fig, ax = plt.subplots()
-    ax.scatter(X[:, 0], X[:, 1], color = 'green', alpha = 0.25)
-    ax.scatter(y[:, 0], y[:, 1], color = 'blue', alpha = 0.25)
-    for i, (x_coord, y_coord) in enumerate(zip(y[:, 0], y[:, 1])):
-        circ = plt.Circle((x_coord, y_coord), 0.2, fill = False)
-        ax.add_patch(circ)
-        ax.scatter(X[:, 0][matches[i]], X[:, 1][matches[i]], s = 1, color = 'blue')
-    # plt.scatter(y[matches], color = 'blue')
-    ax.set_aspect('equal', adjustable='datalim')
-    plt.show()
-
-if __name__ == "__main__":
-    pass
