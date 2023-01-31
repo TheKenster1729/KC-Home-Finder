@@ -33,6 +33,17 @@ def displayOptions(selected_schools, map, radius):
     addToFoliumMap(groceries_to_display, map)
 
 st.set_page_config(layout = 'wide')
+with st.sidebar:
+    st.header("Welcome to KC Home Finder!")
+    st.markdown("The goal of this web app is to make it easier to find an apartment in \
+        Kansas City, particularly if you're looking to live close to your school. The suggested \
+        use is to select a school or schools you're interested in looking at from the dropdown menu \
+        (each school is one of the TFA KC partner schools), select a radius around which you'd like to \
+        search for apartments and grocery stores, and then explore using the generated map.")
+    st.markdown("Right now, only grocery stores (shopping cart icon), schools (pencil icon), and apartments \
+        (house icon) will display on the map, because those are the most important to me personally. But \
+        if you'd like to see more features around each of the schools (e.g. cafes, restaurants), just let me know \
+        and I can incorporate it without much trouble.")
 with st.form("select_schools"):
     label = 'Please select the school(s) you would like to see options for. Schools will be rendered as a pencil on the map.'
     selected_schools = st.multiselect(label, school_df['Name'])
